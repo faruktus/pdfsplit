@@ -2,10 +2,9 @@ from pypdf import PdfReader, PdfWriter
 
 subject = "pdf 2_untiltwo 5_untilfive 9_untilnine 15_untilfifteen"
 
-pdflist = subject.split()[1:]
-
-pdflist_cum=[]
-for x in pdflist:
+# make a list of given split points / names
+splitlist=[]
+for x in subject.split()[1:]:
     try:
         number = int(x[:x.find("_")])
     except:
@@ -16,12 +15,13 @@ for x in pdflist:
         print("Name not found")
 
     try:
-        pdflist_cum.append([number, name])
+        splitlist.append([number, name])
     except:
         print("Creation of list not possible")
 
+# adding the starting page for each splitpoint
 temp_number=0
-for x in pdflist_cum:
+for x in splitlist:
     if temp_number == 0:
         x.insert(0, 1)
         temp_number = x[1]
@@ -29,14 +29,17 @@ for x in pdflist_cum:
         x.insert(0, temp_number)
         temp_number = x[1]
 
+# write pdf files
 with open("combinedminutes.pdf",'rb') as pdf_file:
     reader = PdfReader(pdf_file)
     writer = PdfWriter()
 
-    for x in pdflist_cum:
+    for x in splitlist:
         for page in reader.pages[x[0]:x[1]+1]:
             writer.add_page(page)
 
             with open(x[2], 'wb') as output_pdf:
                 writer.write(output_pdf)
+                
+        # reset PdfWriter
         writer = PdfWriter()
